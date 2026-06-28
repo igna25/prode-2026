@@ -66,9 +66,43 @@ export function usePredictions(matchId) {
       let saved;
       if (isSupabaseConfigured) {
         const client = getSupabaseClient();
+
+        const { data: existingMatch } = await client
+          .from("matches")
+          .select("id")
+          .eq("external_id", match.external_id)
+          .maybeSingle();
+
+        let matchId;
+        if (existingMatch) {
+          matchId = existingMatch.id;
+        } else {
+          const { data: newMatch, error: insertError } = await client
+            .from("matches")
+            .insert({
+              external_id: match.external_id,
+              round: match.round,
+              team_home: match.team_home,
+              team_away: match.team_away,
+              team_home_code: match.team_home_code,
+              team_away_code: match.team_away_code,
+              goals_home: match.goals_home,
+              goals_away: match.goals_away,
+              winner_penalty: match.winner_penalty,
+              status: match.status,
+              match_datetime: match.match_datetime,
+              stadium: match.stadium,
+              bracket_position: match.bracket_position
+            })
+            .select("id")
+            .single();
+          if (insertError) throw insertError;
+          matchId = newMatch.id;
+        }
+
         const payload = {
           participant_id: participant.id,
-          match_id: match.id,
+          match_id: matchId,
           predicted_home_goals: Number(values.homeGoals),
           predicted_away_goals: Number(values.awayGoals),
           predicted_winner: values.winnerPenalty,

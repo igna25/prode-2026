@@ -27,7 +27,7 @@ create table if not exists public.matches (
   status text not null default 'SCHEDULED' check (status in ('SCHEDULED', 'LIVE', 'FINISHED')),
   match_datetime timestamptz not null,
   stadium text,
-  bracket_position int not null default 0,
+  bracket_position bigint not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
