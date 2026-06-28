@@ -10,6 +10,11 @@ function formatPred(prediction) {
   return base;
 }
 
+function formatPoints(points) {
+  if (points == null) return null;
+  return points === 1 ? "+1 punto" : `+${points} puntos`;
+}
+
 export default function MatchPredictionsSheet({ match, open, onClose }) {
   const { participant } = useParticipantContext();
   const { predictions, loading } = useMatchPredictions(open ? match : null);
@@ -34,7 +39,14 @@ export default function MatchPredictionsSheet({ match, open, onClose }) {
                   {p.participant_name}
                   {p.participant_id === participant?.id && <span className="match-preds-you"> (vos)</span>}
                 </span>
-                <span className="match-preds-score">{formatPred(p)}</span>
+                <span className="match-preds-right">
+                  <span className="match-preds-score">{formatPred(p)}</span>
+                  {formatPoints(p.points_earned) && (
+                    <span className={`match-preds-pts${p.points_earned > 0 ? " has-pts" : ""}`}>
+                      {formatPoints(p.points_earned)}
+                    </span>
+                  )}
+                </span>
               </li>
             ))}
           </ul>

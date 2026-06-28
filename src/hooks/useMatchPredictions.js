@@ -37,7 +37,7 @@ export function useMatchPredictions(match) {
 
       const { data, error } = await client
         .from("predictions")
-        .select("id, predicted_home_goals, predicted_away_goals, predicted_winner, participant_id, participants(name)")
+        .select("id, predicted_home_goals, predicted_away_goals, predicted_winner, points_earned, participant_id, participants(name)")
         .eq("match_id", matchId);
 
       if (active && !error) {
