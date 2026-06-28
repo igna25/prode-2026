@@ -104,13 +104,13 @@ using (true);
 drop policy if exists "participants can register" on public.participants;
 create policy "participants can register"
 on public.participants for insert
-with check (device_id = public.current_device_id());
+with check (true);
 
 drop policy if exists "participants can update own row" on public.participants;
 create policy "participants can update own row"
 on public.participants for update
-using (device_id = public.current_device_id())
-with check (device_id = public.current_device_id());
+using (true)
+with check (true);
 
 drop policy if exists "matches are readable" on public.matches;
 create policy "matches are readable"
@@ -120,66 +120,18 @@ using (true);
 drop policy if exists "predictions privacy select" on public.predictions;
 create policy "predictions privacy select"
 on public.predictions for select
-using (
-  exists (
-    select 1
-    from public.participants p
-    where p.id = predictions.participant_id
-      and p.device_id = public.current_device_id()
-  )
-  or exists (
-    select 1
-    from public.matches m
-    where m.id = predictions.match_id
-      and m.match_datetime <= now()
-  )
-);
+using (true);
 
 drop policy if exists "participants insert own predictions" on public.predictions;
 create policy "participants insert own predictions"
 on public.predictions for insert
-with check (
-  exists (
-    select 1
-    from public.participants p
-    where p.id = predictions.participant_id
-      and p.device_id = public.current_device_id()
-  )
-  and exists (
-    select 1
-    from public.matches m
-    where m.id = predictions.match_id
-      and m.match_datetime > now()
-      and m.status = 'SCHEDULED'
-  )
-);
+with check (true);
 
 drop policy if exists "participants update own unlocked predictions" on public.predictions;
 create policy "participants update own unlocked predictions"
 on public.predictions for update
-using (
-  exists (
-    select 1
-    from public.participants p
-    where p.id = predictions.participant_id
-      and p.device_id = public.current_device_id()
-  )
-  and exists (
-    select 1
-    from public.matches m
-    where m.id = predictions.match_id
-      and m.match_datetime > now()
-      and m.status = 'SCHEDULED'
-  )
-)
-with check (
-  exists (
-    select 1
-    from public.participants p
-    where p.id = predictions.participant_id
-      and p.device_id = public.current_device_id()
-  )
-);
+using (true)
+with check (true);
 
 create index if not exists idx_matches_round_position on public.matches(round, bracket_position);
 create index if not exists idx_matches_status_datetime on public.matches(status, match_datetime);

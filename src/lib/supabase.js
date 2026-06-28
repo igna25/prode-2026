@@ -15,22 +15,10 @@ export function getStoredDeviceId() {
 }
 
 export const supabase = isSupabaseConfigured
-  ? createClient(supabaseUrl, supabaseAnonKey, {
-      global: {
-        headers: {
-          "x-device-id": getStoredDeviceId()
-        }
-      }
-    })
+  ? createClient(supabaseUrl, supabaseAnonKey)
   : null;
 
 export function getSupabaseClient() {
   if (!isSupabaseConfigured) return null;
-  return createClient(supabaseUrl, supabaseAnonKey, {
-    global: {
-      headers: {
-        "x-device-id": getStoredDeviceId()
-      }
-    }
-  });
+  return createClient(supabaseUrl, supabaseAnonKey);
 }
