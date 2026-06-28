@@ -6,9 +6,9 @@ select cron.schedule(
   '*/5 * * * *',
   $$
     select net.http_post(
-      url := current_setting('app.settings.supabase_url') || '/functions/v1/send-notifications',
+      url := 'https://lqghfpjbmoqbffvyayd.supabase.co/functions/v1/send-notifications',
       headers := jsonb_build_object(
-        'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key'),
+        'Authorization', 'Bearer ' || current_setting('app.settings.service_role_key', true),
         'Content-Type', 'application/json'
       ),
       body := '{}'::jsonb
