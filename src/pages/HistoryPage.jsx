@@ -1,13 +1,15 @@
 import { useMemo, useState } from "react";
 import HistoryList from "../components/History/HistoryList";
+import PredictionModal from "../components/Prediction/PredictionModal";
 import { useMatches } from "../hooks/useMatches";
 import { usePredictions } from "../hooks/usePredictions";
 import { rounds } from "../lib/rounds";
 
 export default function HistoryPage() {
   const { matches } = useMatches();
-  const { myPredictions } = usePredictions();
+  const { myPredictions, predictionByMatch } = usePredictions();
   const [round, setRound] = useState("ALL");
+  const [selectedMatch, setSelectedMatch] = useState(null);
 
   const filteredMatches = useMemo(
     () => (round === "ALL" ? matches : matches.filter((match) => match.round === round)),
@@ -36,7 +38,17 @@ export default function HistoryPage() {
           </button>
         ))}
       </div>
-      <HistoryList matches={filteredMatches} predictions={myPredictions} />
+      <HistoryList
+        matches={filteredMatches}
+        predictionByMatch={predictionByMatch}
+        onSelectMatch={setSelectedMatch}
+      />
+      <PredictionModal
+        match={selectedMatch}
+        open={Boolean(selectedMatch)}
+        prediction={selectedMatch ? predictionByMatch.get(selectedMatch.id) : null}
+        onClose={() => setSelectedMatch(null)}
+      />
     </section>
   );
 }

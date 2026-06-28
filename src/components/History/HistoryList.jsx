@@ -1,7 +1,6 @@
 import HistoryCard from "./HistoryCard";
 
-export default function HistoryList({ matches, predictions }) {
-  const predictionByMatch = new Map(predictions.map((prediction) => [prediction.match_id, prediction]));
+export default function HistoryList({ matches, predictionByMatch, onSelectMatch }) {
   const ordered = [...matches].sort(
     (a, b) => new Date(a.match_datetime) - new Date(b.match_datetime)
   );
@@ -17,6 +16,7 @@ export default function HistoryList({ matches, predictions }) {
           key={match.id}
           match={match}
           prediction={predictionByMatch.get(match.id)}
+          onSelect={() => onSelectMatch(match)}
         />
       ))}
     </div>

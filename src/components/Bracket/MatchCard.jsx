@@ -59,6 +59,14 @@ export default function MatchCard({ match, prediction, onSelect }) {
       </div>
       <TeamLine code={match.team_home_code} name={match.team_home} goals={match.goals_home} />
       <TeamLine code={match.team_away_code} name={match.team_away} goals={match.goals_away} />
+      {prediction && (
+        <p className="match-prediction-line">
+          Tu predicción: {prediction.predicted_home_goals}-{prediction.predicted_away_goals}
+          {prediction.predicted_home_goals === prediction.predicted_away_goals && prediction.predicted_winner
+            ? ` (pasa ${prediction.predicted_winner === "HOME" ? match.team_home : match.team_away})`
+            : ""}
+        </p>
+      )}
       <div className="match-card-bottom">
         <span>{date} ART</span>
         <span>{locked ? "Bloqueado" : <CountdownTimer date={match.match_datetime} />}</span>

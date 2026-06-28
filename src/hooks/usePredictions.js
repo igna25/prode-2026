@@ -7,6 +7,8 @@ import {
 } from "../lib/localStore";
 import { getSupabaseClient, isSupabaseConfigured } from "../lib/supabase";
 
+const PREDICTIONS_CHANGE = "prode-predictions-change";
+
 export function isMatchLocked(match) {
   if (!match?.match_datetime) return false;
   return new Date(match.match_datetime).getTime() <= Date.now() || match.status !== "SCHEDULED";
@@ -15,6 +17,7 @@ export function isMatchLocked(match) {
 export function usePredictions(matchId) {
   const { participant } = useParticipantContext();
   const [predictions, setPredictions] = useState(() => getPredictions());
+  const [matchIdMap, setMatchIdMap] = useState(new Map());
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
@@ -27,19 +30,37 @@ export function usePredictions(matchId) {
         return;
       }
 
-      const { data, error } = await getSupabaseClient()
+      const client = getSupabaseClient();
+
+      const { data, error } = await client
         .from("predictions")
         .select("*")
         .eq("participant_id", participant.id);
 
       if (active && !error) setPredictions(data ?? []);
+
+      const { data: matches } = await client
+        .from("matches")
+        .select("id, external_id");
+
+      if (active && matches) {
+        const map = new Map();
+        matches.forEach((m) => {
+          if (m.external_id) map.set(m.id, `external-${m.external_id}`);
+        });
+        setMatchIdMap(map);
+      }
     }
 
     load();
-    const unsubscribe = subscribeLocalStore(() => setPredictions(getPredictions()));
+    const unsubscribeLocal = subscribeLocalStore(() => setPredictions(getPredictions()));
+    const onPredictionsChange = () => load();
+    window.addEventListener(PREDICTIONS_CHANGE, onPredictionsChange);
+
     return () => {
       active = false;
-      unsubscribe();
+      unsubscribeLocal();
+      window.removeEventListener(PREDICTIONS_CHANGE, onPredictionsChange);
     };
   }, [participant]);
 
@@ -53,9 +74,13 @@ export function usePredictions(matchId) {
 
   const predictionByMatch = useMemo(() => {
     const map = new Map();
-    myPredictions.forEach((prediction) => map.set(prediction.match_id, prediction));
+    myPredictions.forEach((prediction) => {
+      map.set(prediction.match_id, prediction);
+      const externalKey = matchIdMap.get(prediction.match_id);
+      if (externalKey) map.set(externalKey, prediction);
+    });
     return map;
-  }, [myPredictions]);
+  }, [myPredictions, matchIdMap]);
 
   async function savePrediction(match, values) {
     if (!participant) throw new Error("No hay participante activo.");
@@ -123,6 +148,7 @@ export function usePredictions(matchId) {
         ...current.filter((item) => item.id !== saved.id),
         saved
       ]);
+      window.dispatchEvent(new CustomEvent(PREDICTIONS_CHANGE));
       return saved;
     } finally {
       setSaving(false);

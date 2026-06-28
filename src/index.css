@@ -361,6 +361,14 @@ img {
   color: var(--green);
 }
 
+.match-prediction-line {
+  margin: 0;
+  color: var(--green);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
 .countdown {
   color: var(--gold);
   font-weight: 800;
@@ -578,6 +586,35 @@ img {
   align-items: center;
   gap: 16px;
   padding: 14px;
+}
+
+.history-card-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+
+.history-edit-btn {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--sky);
+  background: transparent;
+  font-size: 0.75rem;
+  font-weight: 700;
+  transition: background 150ms ease;
+}
+
+.history-edit-btn:hover:not(:disabled) {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.history-edit-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
 }
 
 .history-card h3,
