@@ -170,6 +170,11 @@ img {
   text-decoration: none;
 }
 
+.nav-item span:first-child {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
 .nav-item span:last-child {
   overflow: hidden;
   max-width: 100%;
