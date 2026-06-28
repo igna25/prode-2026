@@ -3,6 +3,7 @@ import Header from "./Header";
 import Navbar from "./Navbar";
 import InstallBanner from "../UI/InstallBanner";
 import UpdateBanner from "../UI/UpdateBanner";
+import NotificationBanner from "../UI/NotificationBanner";
 
 export default function Layout() {
   return (
@@ -14,6 +15,7 @@ export default function Layout() {
       <Navbar />
       <InstallBanner />
       <UpdateBanner />
+      <NotificationBanner />
     </div>
   );
 }

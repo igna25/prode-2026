@@ -963,6 +963,84 @@ img {
   background: rgba(255, 255, 255, 0.08);
 }
 
+.notif-banner {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(92%, 420px);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+  animation: install-slide-up 0.35s ease-out;
+}
+
+.notif-banner-icon {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+}
+
+.notif-banner-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--white);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.notif-banner-text strong {
+  font-weight: 800;
+}
+
+.notif-banner-text span {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.notif-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.notif-banner-btn {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 8px;
+  color: #071126;
+  background: linear-gradient(135deg, var(--sky), var(--gold));
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.notif-banner-dismiss {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 0.85rem;
+}
+
+.notif-banner-dismiss:hover {
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.08);
+}
+
 .update-banner {
   position: fixed;
   top: 80px;
