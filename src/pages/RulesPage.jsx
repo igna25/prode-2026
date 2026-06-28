@@ -13,7 +13,6 @@ const examples = [
   ["Predicción: 0-0, pasa Argentina", "Resultado: 0-0, pasa Cabo Verde", "4"],
   ["Predicción: 0-0, pasa Argentina", "Resultado: 2-0, gana Argentina", "4"],
   ["Predicción: 2-1, gana Argentina", "Resultado: 0-0, pasa Argentina", "3"],
-  ["Predicción: 1-2, pasa Cabo verde", "Resultado: 3-2, gana Argentina", "1"]
 ];
 
 export default function RulesPage() {

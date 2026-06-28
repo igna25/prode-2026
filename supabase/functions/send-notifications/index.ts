@@ -38,7 +38,7 @@ Deno.serve(async () => {
 
     const payload = JSON.stringify({
       title: "Prode Mundialista 2026",
-      body: `Faltan 30 min para ${match.team_home} vs ${match.team_away}`,
+      body: `Faltan 30 min para ${match.team_home} vs ${match.team_away} revisa tu predicción!`,
       icon: "/icons/icon.svg",
       badge: "/icons/icon.svg",
       data: { url: "/" }
