@@ -1,14 +1,24 @@
 import { useState } from "react";
 import BracketView from "../components/Bracket/BracketView";
 import PredictionModal from "../components/Prediction/PredictionModal";
+import MatchPredictionsSheet from "../components/UI/MatchPredictionsSheet";
 import LoadingSpinner from "../components/UI/LoadingSpinner";
 import { useMatches } from "../hooks/useMatches";
-import { usePredictions } from "../hooks/usePredictions";
+import { usePredictions, isMatchLocked } from "../hooks/usePredictions";
 
 export default function BracketPage() {
   const { matchesByRound, totalMatches, loading, error } = useMatches();
   const { predictionByMatch } = usePredictions();
   const [selectedMatch, setSelectedMatch] = useState(null);
+  const [viewingMatch, setViewingMatch] = useState(null);
+
+  function handleSelectMatch(match) {
+    if (isMatchLocked(match)) {
+      setViewingMatch(match);
+    } else {
+      setSelectedMatch(match);
+    }
+  }
 
   if (loading) return <LoadingSpinner label="Cargando cuadro" />;
 
@@ -29,7 +39,7 @@ export default function BracketPage() {
         <BracketView
           rounds={matchesByRound}
           predictionByMatch={predictionByMatch}
-          onSelectMatch={setSelectedMatch}
+          onSelectMatch={handleSelectMatch}
         />
       )}
       <PredictionModal
@@ -37,6 +47,11 @@ export default function BracketPage() {
         open={Boolean(selectedMatch)}
         prediction={selectedMatch ? predictionByMatch.get(selectedMatch.id) : null}
         onClose={() => setSelectedMatch(null)}
+      />
+      <MatchPredictionsSheet
+        match={viewingMatch}
+        open={Boolean(viewingMatch)}
+        onClose={() => setViewingMatch(null)}
       />
     </section>
   );

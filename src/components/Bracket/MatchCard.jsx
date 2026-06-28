@@ -69,7 +69,7 @@ export default function MatchCard({ match, prediction, onSelect }) {
       )}
       <div className="match-card-bottom">
         <span>{date} ART</span>
-        <span>{locked ? "Bloqueado" : <CountdownTimer date={match.match_datetime} />}</span>
+        <span>{locked ? "Ver predicciones" : <CountdownTimer date={match.match_datetime} />}</span>
       </div>
       {match.stadium && <small>{match.stadium}</small>}
     </button>

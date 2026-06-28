@@ -1158,3 +1158,56 @@ img {
     font-size: 0.68rem;
   }
 }
+
+.match-preds-sheet {
+  padding: 0 20px 20px;
+}
+
+.match-preds-empty {
+  text-align: center;
+  color: var(--muted);
+  font-size: 0.85rem;
+  padding: 16px 0;
+}
+
+.match-preds-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.match-preds-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 12px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 0.85rem;
+}
+
+.match-preds-row.is-current {
+  background: rgba(117, 184, 244, 0.12);
+  border: 1px solid rgba(117, 184, 244, 0.25);
+}
+
+.match-preds-name {
+  color: var(--white);
+  font-weight: 600;
+}
+
+.match-preds-you {
+  color: var(--sky);
+  font-weight: 400;
+  font-size: 0.78rem;
+}
+
+.match-preds-score {
+  color: var(--gold);
+  font-family: "JetBrains Mono", monospace;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
