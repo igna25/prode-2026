@@ -1,6 +1,20 @@
 import { isMatchLocked } from "../../hooks/usePredictions";
 import Badge from "../UI/Badge";
 
+function Flag({ code, name }) {
+  if (!code) return <span className="flag-placeholder" aria-hidden="true" />;
+  const isUrl = String(code).startsWith("http");
+  const src = isUrl ? code : `https://flagcdn.com/w80/${String(code).toLowerCase()}.png`;
+  return (
+    <img
+      className="flag"
+      src={src}
+      alt={`Escudo/Bandera de ${name}`}
+      loading="lazy"
+    />
+  );
+}
+
 function formatPrediction(prediction, match) {
   if (!prediction) return "Sin predicción";
   const base = `${prediction.predicted_home_goals}-${prediction.predicted_away_goals}`;
@@ -30,7 +44,13 @@ export default function HistoryCard({ match, prediction, onSelect }) {
     <article className="history-card">
       <div className="history-card-header">
         <div>
-          <h3>{match.team_home} vs {match.team_away}</h3>
+          <h3 className="history-card-teams">
+            <Flag code={match.team_home_code} name={match.team_home} />
+            <span>{match.team_home}</span>
+            <span className="history-vs">vs</span>
+            <Flag code={match.team_away_code} name={match.team_away} />
+            <span>{match.team_away}</span>
+          </h3>
           <p>{match.round}</p>
         </div>
         <button

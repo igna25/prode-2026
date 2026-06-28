@@ -637,6 +637,24 @@ img {
   margin: 0;
 }
 
+.history-card-teams {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.history-card-teams .flag {
+  width: 22px;
+  height: 16px;
+}
+
+.history-vs {
+  color: var(--muted);
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
 .history-card p {
   margin: 2px 0 0;
   color: var(--muted);
