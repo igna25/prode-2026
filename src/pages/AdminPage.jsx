@@ -1,6 +1,8 @@
 import { useMemo, useState } from "react";
 import { updateMatchResult, recalculateLocalPoints } from "../lib/localStore";
 import { useMatches } from "../hooks/useMatches";
+import { getSupabaseClient, isSupabaseConfigured } from "../lib/supabase";
+import { calculatePoints, toScoringPrediction, toScoringResult } from "../lib/scoring";
 
 export default function AdminPage() {
   const [password, setPassword] = useState("");
@@ -20,15 +22,59 @@ export default function AdminPage() {
     if (password !== adminPassword) setMessage("Contraseña incorrecta");
   }
 
-  function handleResult(match, field, value) {
-    updateMatchResult(match.id, {
+  async function handleResult(match, field, value) {
+    const patch = {
       [field]: value === "" ? null : field.includes("goals") ? Number(value) : value
-    });
+    };
+    updateMatchResult(match.id, patch);
+
+    if (isSupabaseConfigured && match.external_id) {
+      const client = getSupabaseClient();
+      await client.from("matches").update(patch).eq("external_id", match.external_id);
+    }
   }
 
-  function finishMatch(match) {
+  async function finishMatch(match) {
     updateMatchResult(match.id, { status: "FINISHED" });
     recalculateLocalPoints(match.id);
+
+    if (isSupabaseConfigured && match.external_id) {
+      const client = getSupabaseClient();
+
+      const { data: dbMatch } = await client
+        .from("matches")
+        .select("id")
+        .eq("external_id", match.external_id)
+        .maybeSingle();
+
+      if (dbMatch) {
+        await client
+          .from("matches")
+          .update({ status: "FINISHED" })
+          .eq("id", dbMatch.id);
+
+        const { data: predictions } = await client
+          .from("predictions")
+          .select("id, predicted_home_goals, predicted_away_goals, predicted_winner")
+          .eq("match_id", dbMatch.id);
+
+        if (predictions?.length) {
+          const real = toScoringResult(match);
+          await Promise.all(
+            predictions.map((pred) =>
+              client
+                .from("predictions")
+                .update({
+                  is_locked: true,
+                  points_earned: calculatePoints(toScoringPrediction(pred), real)
+                })
+                .eq("id", pred.id)
+            )
+          );
+        }
+      }
+    }
+
     setMessage("Resultado guardado y puntos recalculados");
   }
 

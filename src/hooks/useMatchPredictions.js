@@ -2,14 +2,16 @@ import { useEffect, useState } from "react";
 import { getSupabaseClient, isSupabaseConfigured } from "../lib/supabase";
 
 async function resolveMatchId(client, match) {
+  if (match.external_id) {
+    const { data } = await client
+      .from("matches")
+      .select("id")
+      .eq("external_id", match.external_id)
+      .maybeSingle();
+    return data?.id ?? null;
+  }
   if (match.id) return match.id;
-  if (!match.external_id) return null;
-  const { data } = await client
-    .from("matches")
-    .select("id")
-    .eq("external_id", match.external_id)
-    .maybeSingle();
-  return data?.id ?? null;
+  return null;
 }
 
 export function useMatchPredictions(match) {
