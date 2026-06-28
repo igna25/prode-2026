@@ -3,6 +3,7 @@ import {
   clearCurrentParticipant,
   createParticipantDraft,
   getCurrentParticipant,
+  getParticipants,
   normalizeParticipantName,
   saveParticipant,
   subscribeLocalStore
@@ -101,10 +102,14 @@ export function ParticipantProvider({ children }) {
       throw new Error("No se encontró un participante con ese nombre.");
     }
 
+    const existingLocal = getParticipants().find(
+      (p) => normalizeParticipantName(p.name) === normalizedName
+    );
+
     const saved = saveParticipant({
       id: data.id,
       name: data.name,
-      device_id: getCurrentParticipant()?.device_id || createParticipantDraft(data.name).device_id,
+      device_id: existingLocal?.device_id || createParticipantDraft(data.name).device_id,
       created_at: new Date().toISOString()
     });
     setParticipant(saved);
