@@ -40,6 +40,12 @@ export default function HistoryCard({ match, prediction, onSelect }) {
   const tone = points == null ? "neutral" : points > 0 ? "success" : "danger";
   const locked = isMatchLocked(match);
 
+  function pointsLabel() {
+    if (points == null) return "Pendiente";
+    const noun = points === 1 ? "punto" : "puntos";
+    return `+${points} ${noun}`;
+  }
+
   return (
     <article className="history-card">
       <div>
@@ -59,7 +65,7 @@ export default function HistoryCard({ match, prediction, onSelect }) {
         <strong>{formatResult(match)}</strong>
       </div>
       <div className="history-card-footer">
-        <Badge tone={tone}>{points == null ? "Pendiente" : `${points} pts`}</Badge>
+        <Badge tone={tone}>{pointsLabel()}</Badge>
         <button
           type="button"
           className="history-edit-btn"
