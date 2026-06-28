@@ -3,10 +3,11 @@ import { Navigate, useNavigate } from "react-router-dom";
 import { useParticipantContext } from "../context/ParticipantContext";
 
 export default function WelcomePage() {
-  const { participant, joinTournament } = useParticipantContext();
+  const { participant, joinTournament, loginParticipant } = useParticipantContext();
   const [name, setName] = useState("");
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
+  const [mode, setMode] = useState("register");
   const navigate = useNavigate();
 
   if (participant) return <Navigate to="/" replace />;
@@ -17,10 +18,14 @@ export default function WelcomePage() {
     setError("");
     setSaving(true);
     try {
-      await joinTournament(name);
+      if (mode === "register") {
+        await joinTournament(name);
+      } else {
+        await loginParticipant(name);
+      }
       navigate("/", { replace: true });
     } catch (joinError) {
-      setError(joinError.message || "No se pudo registrar el participante.");
+      setError(joinError.message || "No se pudo completar la operación.");
     } finally {
       setSaving(false);
     }
@@ -37,6 +42,22 @@ export default function WelcomePage() {
         <p className="welcome-copy">
           Armá tus predicciones para la fase eliminatoria y seguí la tabla en vivo.
         </p>
+        <div className="welcome-tabs">
+          <button
+            type="button"
+            className={`welcome-tab ${mode === "register" ? "active" : ""}`}
+            onClick={() => { setMode("register"); setError(""); }}
+          >
+            Nuevo
+          </button>
+          <button
+            type="button"
+            className={`welcome-tab ${mode === "login" ? "active" : ""}`}
+            onClick={() => { setMode("login"); setError(""); }}
+          >
+            Ya tengo cuenta
+          </button>
+        </div>
         <form onSubmit={handleSubmit} className="welcome-form">
           <label>
             <span>Tu nombre</span>
@@ -50,7 +71,11 @@ export default function WelcomePage() {
             />
           </label>
           <button className="primary-button" disabled={!name.trim() || saving}>
-            {saving ? "Entrando..." : "Unirse al torneo"}
+            {saving
+              ? "Entrando..."
+              : mode === "register"
+                ? "Unirse al torneo"
+                : "Entrar"}
           </button>
           {error && <p className="form-error">{error}</p>}
         </form>

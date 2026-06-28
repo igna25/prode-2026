@@ -682,6 +682,31 @@ img {
   font-size: 1.05rem;
 }
 
+.welcome-tabs {
+  display: flex;
+  gap: 4px;
+  background: rgba(10, 17, 40, 0.6);
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.welcome-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: background 0.2s, color 0.2s;
+}
+
+.welcome-tab.active {
+  background: var(--blue);
+  color: var(--white);
+}
+
 .welcome-form,
 .admin-login {
   display: grid;

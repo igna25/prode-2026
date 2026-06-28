@@ -33,15 +33,15 @@ export function ParticipantProvider({ children }) {
     if (isSupabaseConfigured) {
       const client = getSupabaseClient();
       const normalizedName = normalizeParticipantName(draft.name);
-      const { data: duplicate, error: duplicateError } = await client
+      const { data: existing, error: existingError } = await client
         .from("participants")
-        .select("id, device_id")
+        .select("id, name")
         .eq("name_normalized", normalizedName)
         .maybeSingle();
 
-      if (duplicateError) throw duplicateError;
-      if (duplicate && duplicate.device_id !== draft.device_id) {
-        const error = new Error("Ese nombre ya está en uso. Probá con otro.");
+      if (existingError) throw existingError;
+      if (existing) {
+        const error = new Error("Ese nombre ya está en uso. Usá \"Ya tengo cuenta\" para acceder.");
         error.code = "DUPLICATE_PARTICIPANT_NAME";
         throw error;
       }
@@ -58,7 +58,7 @@ export function ParticipantProvider({ children }) {
 
       if (error) {
         if (error.code === "23505") {
-          const duplicateNameError = new Error("Ese nombre ya está en uso. Probá con otro.");
+          const duplicateNameError = new Error("Ese nombre ya está en uso. Usá \"Ya tengo cuenta\" para acceder.");
           duplicateNameError.code = "DUPLICATE_PARTICIPANT_NAME";
           throw duplicateNameError;
         }
@@ -79,6 +79,38 @@ export function ParticipantProvider({ children }) {
     return saved;
   }
 
+  async function loginParticipant(name) {
+    if (!isSupabaseConfigured) {
+      const current = getCurrentParticipant();
+      if (current && normalizeParticipantName(current.name) === normalizeParticipantName(name)) {
+        return current;
+      }
+      throw new Error("No se encontró un participante con ese nombre.");
+    }
+
+    const client = getSupabaseClient();
+    const normalizedName = normalizeParticipantName(name);
+    const { data, error } = await client
+      .from("participants")
+      .select("id, name")
+      .eq("name_normalized", normalizedName)
+      .maybeSingle();
+
+    if (error) throw error;
+    if (!data) {
+      throw new Error("No se encontró un participante con ese nombre.");
+    }
+
+    const saved = saveParticipant({
+      id: data.id,
+      name: data.name,
+      device_id: getCurrentParticipant()?.device_id || createParticipantDraft(data.name).device_id,
+      created_at: new Date().toISOString()
+    });
+    setParticipant(saved);
+    return saved;
+  }
+
   function leaveTournament() {
     clearCurrentParticipant();
     setParticipant(null);
@@ -89,6 +121,7 @@ export function ParticipantProvider({ children }) {
       participant,
       loading,
       joinTournament,
+      loginParticipant,
       leaveTournament
     }),
     [participant, loading]

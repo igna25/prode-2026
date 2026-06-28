@@ -12,6 +12,9 @@ export default function Header() {
       </div>
       <div className="header-user">
         <span>{participant?.name}</span>
+        <button className="icon-button" onClick={leaveTournament} title="Salir">
+          <LogOut />
+        </button>
       </div>
     </header>
   );
