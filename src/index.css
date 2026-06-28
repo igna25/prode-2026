@@ -597,18 +597,19 @@ img {
 
 .history-card {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
-  align-items: center;
-  gap: 16px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto auto auto;
+  align-items: start;
+  gap: 10px 16px;
   padding: 14px;
 }
 
-.history-card-header {
+.history-card-footer {
+  grid-column: 1 / -1;
   display: flex;
-  align-items: start;
+  align-items: center;
   justify-content: space-between;
-  gap: 8px;
-  min-width: 0;
+  gap: 10px;
 }
 
 .history-edit-btn {

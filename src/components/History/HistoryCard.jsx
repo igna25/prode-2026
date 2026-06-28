@@ -42,17 +42,24 @@ export default function HistoryCard({ match, prediction, onSelect }) {
 
   return (
     <article className="history-card">
-      <div className="history-card-header">
-        <div>
-          <h3 className="history-card-teams">
-            <Flag code={match.team_home_code} name={match.team_home} />
-            <span>{match.team_home}</span>
-            <span className="history-vs">vs</span>
-            <Flag code={match.team_away_code} name={match.team_away} />
-            <span>{match.team_away}</span>
-          </h3>
-          <p>{match.round}</p>
-        </div>
+      <div>
+        <h3 className="history-card-teams">
+          <Flag code={match.team_home_code} name={match.team_home} />
+          <span>{match.team_home}</span>
+          <span className="history-vs">vs</span>
+          <Flag code={match.team_away_code} name={match.team_away} />
+          <span>{match.team_away}</span>
+        </h3>
+        <p>{match.round}</p>
+      </div>
+      <div className="history-grid">
+        <span>Tu predicción</span>
+        <strong>{formatPrediction(prediction, match)}</strong>
+        <span>Resultado</span>
+        <strong>{formatResult(match)}</strong>
+      </div>
+      <div className="history-card-footer">
+        <Badge tone={tone}>{points == null ? "Pendiente" : `${points} pts`}</Badge>
         <button
           type="button"
           className="history-edit-btn"
@@ -63,13 +70,6 @@ export default function HistoryCard({ match, prediction, onSelect }) {
           {locked ? "Bloqueado" : "Editar"}
         </button>
       </div>
-      <div className="history-grid">
-        <span>Tu predicción</span>
-        <strong>{formatPrediction(prediction, match)}</strong>
-        <span>Resultado</span>
-        <strong>{formatResult(match)}</strong>
-      </div>
-      <Badge tone={tone}>{points == null ? "Pendiente" : `${points} pts`}</Badge>
     </article>
   );
 }
