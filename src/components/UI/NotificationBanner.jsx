@@ -32,12 +32,17 @@ export default function NotificationBanner() {
       const subscription = await requestPushSubscription();
       if (subscription && isSupabaseConfigured) {
         const client = getSupabaseClient();
-        await client
+        const { error } = await client
           .from("participants")
           .update({ push_subscription: subscription })
           .eq("id", participant.id);
+        if (error) console.error("Error guardando suscripción:", error.message);
+      } else if (!subscription) {
+        console.warn("No se obtuvo suscripción push");
       }
-    } catch {}
+    } catch (err) {
+      console.error("Error en handleAccept:", err);
+    }
     dismiss();
     setVisible(false);
   }
