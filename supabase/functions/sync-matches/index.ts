@@ -26,15 +26,9 @@ function normalizeRound(slug: string | null | undefined) {
   return null;
 }
 
-function normalizeStatus(typeDetail: string | null | undefined) {
-  if (!typeDetail) return "SCHEDULED";
-  const d = typeDetail.toUpperCase();
-  if (["FT", "FINAL"].includes(d)) return "FINISHED";
-  if (d.includes("PEN") || d.includes("AET")) return "FINISHED";
-  if (d.includes("'")) return "LIVE";
-  if (["1H", "HT", "2H", "ET", "BT", "P", "SUSP", "INT", "IN"].some(s => d.includes(s))) {
-    return "LIVE";
-  }
+function normalizeStatus(state: string | null | undefined) {
+  if (state === "post") return "FINISHED";
+  if (state === "in") return "LIVE";
   return "SCHEDULED";
 }
 
@@ -77,9 +71,7 @@ function normalizeEvent(event: Record<string, unknown>) {
   const goalsAway = awayCompetitor?.score != null ? Number(awayCompetitor.score) : null;
 
   const eventStatus = event.status as Record<string, Record<string, unknown>> | undefined;
-  const compStatus = competition.status as Record<string, Record<string, unknown>> | undefined;
-  const statusDetail = (eventStatus?.type as Record<string, unknown>)?.detail
-    ?? (compStatus?.type as Record<string, unknown>)?.detail;
+  const statusState = (eventStatus?.type as Record<string, unknown>)?.state;
 
   const venue = competition.venue as Record<string, unknown> | undefined;
   const details = competition.details as Record<string, unknown>[] | undefined;
@@ -98,7 +90,7 @@ function normalizeEvent(event: Record<string, unknown>) {
     goals_home: goalsHome,
     goals_away: goalsAway,
     winner_penalty: getPenaltyWinner(details),
-    status: normalizeStatus(String(statusDetail ?? "")),
+    status: normalizeStatus(String(statusState ?? "")),
     match_datetime: String(event.date ?? competition.date ?? ""),
     stadium: typeof venue?.fullName === "string" ? venue.fullName : null,
     bracket_position: new Date(String(event.date ?? competition.date ?? "")).getTime()

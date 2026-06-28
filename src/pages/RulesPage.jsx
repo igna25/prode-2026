@@ -1,7 +1,7 @@
 const scoringRows = [
   ["Ganador correcto", "+3"],
-  ["Gol exacto de un equipo con base correcta", "+1"],
-  ["Resultado exacto con ganador", "6"],
+  ["Goles exactos de un equipo", "+1"],
+  ["Resultado exacto con ganador", "+6"],
   ["Empate correcto", "+3"],
   ["Goles exactos en empate", "+1"],
   ["Clasificado por penales correcto", "+1"]

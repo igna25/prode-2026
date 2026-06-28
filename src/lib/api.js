@@ -42,15 +42,9 @@ export function normalizeRound(slug) {
   return null;
 }
 
-function normalizeStatus(typeDetail) {
-  if (!typeDetail) return "SCHEDULED";
-  const d = typeDetail.toUpperCase();
-  if (["FT", "FINAL"].includes(d)) return "FINISHED";
-  if (d.includes("PEN") || d.includes("AET")) return "FINISHED";
-  if (d.includes("'")) return "LIVE";
-  if (["1H", "HT", "2H", "ET", "BT", "P", "SUSP", "INT", "IN"].some(s => d.includes(s))) {
-    return "LIVE";
-  }
+function normalizeStatus(state) {
+  if (state === "post") return "FINISHED";
+  if (state === "in") return "LIVE";
   return "SCHEDULED";
 }
 
@@ -93,7 +87,7 @@ export function normalizeExternalMatches(payload) {
       const goalsHome = homeCompetitor?.score != null ? Number(homeCompetitor.score) : null;
       const goalsAway = awayCompetitor?.score != null ? Number(awayCompetitor.score) : null;
 
-      const statusDetail = event.status?.type?.detail || competition.status?.type?.detail;
+      const statusState = event.status?.type?.state;
 
       return {
         id: `external-${event.id}`,
@@ -106,7 +100,7 @@ export function normalizeExternalMatches(payload) {
         goals_home: goalsHome,
         goals_away: goalsAway,
         winner_penalty: getPenaltyWinner(competition.details),
-        status: normalizeStatus(statusDetail),
+        status: normalizeStatus(statusState),
         match_datetime: event.date || competition.date,
         stadium: competition.venue?.fullName || null,
         bracket_position: new Date(event.date || competition.date).getTime()
