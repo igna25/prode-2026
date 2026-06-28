@@ -61,7 +61,7 @@ export default function PredictionModal({ match, open, prediction, onClose }) {
         )}
 
         <div className="prediction-meta">
-          <span>Bloqueo</span>
+          <span>Bloqueo en</span>
           <CountdownTimer date={match.match_datetime} />
         </div>
 
