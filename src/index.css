@@ -85,6 +85,15 @@ img {
   letter-spacing: 0;
 }
 
+.header-version {
+  display: block;
+  margin-top: 2px;
+  color: var(--muted);
+  font-size: 0.65rem;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+}
+
 .app-header h1,
 .welcome-panel h1 {
   font-size: clamp(2.4rem, 8vw, 4.8rem);
@@ -925,6 +934,78 @@ img {
 }
 
 .install-banner-dismiss:hover {
+  color: var(--white);
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.update-banner {
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: min(92%, 420px);
+  padding: 12px 14px;
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  background: var(--bg-card);
+  backdrop-filter: blur(12px);
+  box-shadow: var(--shadow);
+  animation: install-slide-up 0.35s ease-out;
+}
+
+.update-banner-text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  color: var(--white);
+  font-size: 0.8rem;
+  line-height: 1.35;
+}
+
+.update-banner-text strong {
+  font-weight: 800;
+}
+
+.update-banner-text span {
+  color: var(--muted);
+  font-size: 0.72rem;
+}
+
+.update-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.update-banner-btn {
+  padding: 6px 14px;
+  border: 0;
+  border-radius: 8px;
+  color: #071126;
+  background: linear-gradient(135deg, var(--gold), var(--sky));
+  font-size: 0.75rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.update-banner-dismiss {
+  display: grid;
+  width: 28px;
+  height: 28px;
+  place-items: center;
+  border: 0;
+  border-radius: 999px;
+  color: var(--muted);
+  background: transparent;
+  font-size: 0.85rem;
+}
+
+.update-banner-dismiss:hover {
   color: var(--white);
   background: rgba(255, 255, 255, 0.08);
 }

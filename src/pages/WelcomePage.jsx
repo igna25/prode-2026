@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useParticipantContext } from "../context/ParticipantContext";
 import InstallBanner from "../components/UI/InstallBanner";
+import UpdateBanner from "../components/UI/UpdateBanner";
 
 export default function WelcomePage() {
   const { participant, joinTournament, loginParticipant } = useParticipantContext();
@@ -41,6 +42,7 @@ export default function WelcomePage() {
         </div>
         <p className="eyebrow">Prode Mundialista</p>
         <h1>2026</h1>
+        <span className="header-version">Ver. {import.meta.env.VITE_APP_VERSION}</span>
         <p className="welcome-copy">
           Armá tus predicciones para la fase eliminatoria y seguí la tabla en vivo.
         </p>
@@ -84,6 +86,7 @@ export default function WelcomePage() {
       </section>
     </main>
     <InstallBanner />
+    <UpdateBanner />
     </>
   );
 }

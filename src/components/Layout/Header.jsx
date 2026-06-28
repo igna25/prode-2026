@@ -9,6 +9,7 @@ export default function Header() {
       <div>
         <p className="eyebrow">Prode Mundialista</p>
         <h1>2026</h1>
+        <span className="header-version">Ver. {import.meta.env.VITE_APP_VERSION}</span>
       </div>
       <div className="header-user">
         <span>{participant?.name}</span>

@@ -2,6 +2,7 @@ import { Outlet } from "react-router-dom";
 import Header from "./Header";
 import Navbar from "./Navbar";
 import InstallBanner from "../UI/InstallBanner";
+import UpdateBanner from "../UI/UpdateBanner";
 
 export default function Layout() {
   return (
@@ -12,6 +13,7 @@ export default function Layout() {
       </main>
       <Navbar />
       <InstallBanner />
+      <UpdateBanner />
     </div>
   );
 }

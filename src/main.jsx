@@ -15,7 +15,7 @@ registerSW({
       if (!newWorker) return;
       newWorker.addEventListener("statechange", () => {
         if (newWorker.state === "activated") {
-          window.location.reload();
+          window.dispatchEvent(new Event("app-update-available"));
         }
       });
     });
