@@ -1,0 +1,16 @@
+
+  [32m[1mVITE[22m v6.4.3[39m  [2mready in [0m[1m559[22m[2m[0m ms[22m
+
+  [32m➜[39m  [1mLocal[22m:   [36mhttp://127.0.0.1:[1m5173[22m/[39m
+[2m09:29:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ new dependencies optimized: [33mworkbox-window[32m[39m
+[2m09:29:37[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32m✨ optimized dependencies changed. reloading[39m
+[2m09:39:45[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/context/ParticipantContext.jsx, /src/pages/AdminPage.jsx, /src/pages/HistoryPage.jsx, /src/pages/BracketPage.jsx, /src/components/Prediction/PredictionModal.jsx, /src/components/Bracket/MatchCard.jsx, /src/pages/StandingsPage.jsx[22m
+[2m09:39:49[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/HistoryPage.jsx, /src/pages/AdminPage.jsx, /src/pages/BracketPage.jsx[22m
+[2m09:39:50[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/HistoryPage.jsx[22m
+[2m09:39:53[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/context/ParticipantContext.jsx, /src/pages/AdminPage.jsx, /src/pages/HistoryPage.jsx, /src/pages/BracketPage.jsx, /src/components/Prediction/PredictionModal.jsx, /src/components/Bracket/MatchCard.jsx, /src/pages/StandingsPage.jsx[22m
+[2m09:41:36[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/context/ParticipantContext.jsx[22m
+[2m09:41:39[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/WelcomePage.jsx[22m
+[2m09:47:31[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Layout/Header.jsx[22m
+[2m09:55:54[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/components/Bracket/MatchCard.jsx[22m
+[2m09:56:01[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/context/ParticipantContext.jsx[22m
+[2m10:00:41[22m [36m[1m[vite][22m[39m [90m[2m(client)[22m[39m [32mhmr update [39m[2m/src/pages/BracketPage.jsx[22m

@@ -1,0 +1,30 @@
+{
+  "name": "prode-mundialista-2026",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.7.0",
+  "scripts": {
+    "dev": "vite --host 127.0.0.1",
+    "build": "vite build",
+    "preview": "vite preview --host 127.0.0.1",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@supabase/supabase-js": "^2.45.0",
+    "date-fns": "^4.1.0",
+    "date-fns-tz": "^3.2.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-router-dom": "^7.0.0",
+    "workbox-window": "^7.1.0"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.0",
+    "vite": "^6.0.0",
+    "vite-plugin-pwa": "^0.21.0",
+    "workbox-core": "^7.1.0",
+    "workbox-precaching": "^7.1.0",
+    "vitest": "^2.1.0"
+  }
+}
