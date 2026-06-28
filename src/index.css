@@ -302,6 +302,22 @@ img {
   font-size: 0.82rem;
 }
 
+.match-card-points {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 2px 8px;
+  border-radius: 6px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.match-card-points.has-pts {
+  color: var(--green);
+  background: rgba(76, 175, 80, 0.15);
+}
+
 .team-line {
   display: grid;
   grid-template-columns: 30px minmax(0, 1fr) 32px;

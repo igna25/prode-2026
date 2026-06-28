@@ -47,6 +47,8 @@ export default function MatchCard({ match, prediction, onSelect }) {
     ? format(new Date(match.match_datetime), "d MMM HH:mm", { locale: es })
     : "Fecha a confirmar";
 
+  const points = prediction?.points_earned;
+
   return (
     <button className="match-card" type="button" onClick={() => onSelect(match)}>
       <div className="match-card-top">
@@ -71,7 +73,11 @@ export default function MatchCard({ match, prediction, onSelect }) {
         <span>{date} ART</span>
         <span>{locked ? "Ver predicciones" : <CountdownTimer date={match.match_datetime} />}</span>
       </div>
-      {match.stadium && <small>{match.stadium}</small>}
+      {points != null && (
+        <span className={`match-card-points${points > 0 ? " has-pts" : ""}`}>
+          {points === 1 ? "+1 punto" : `+${points} puntos`}
+        </span>
+      )}
     </button>
   );
 }
