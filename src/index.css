@@ -213,7 +213,8 @@ img {
 .bracket-scroll {
   overflow-x: auto;
   padding-bottom: 12px;
-  scroll-snap-type: x mandatory;
+  scroll-snap-type: x proximity;
+  -webkit-overflow-scrolling: touch;
 }
 
 .bracket-grid {
@@ -1026,7 +1027,7 @@ img {
   }
 
   .bracket-grid {
-    grid-template-columns: repeat(6, minmax(270px, 82vw));
+    grid-template-columns: repeat(6, 78vw);
     min-width: max-content;
   }
 

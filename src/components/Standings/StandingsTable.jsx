@@ -8,8 +8,8 @@ export default function StandingsTable({ standings }) {
           <tr>
             <th>#</th>
             <th>Nombre</th>
-            <th>Pred.</th>
-            <th>Pts</th>
+            <th>Puntos</th>
+            <th>Prediciones</th>
           </tr>
         </thead>
         <tbody>

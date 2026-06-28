@@ -8,8 +8,8 @@ export default function ParticipantRow({ row }) {
     <tr className={isCurrent ? "is-current-user" : ""}>
       <td>{row.rank}</td>
       <td>{row.name}</td>
-      <td>{row.predictionsCount}</td>
       <td className="points-cell">{row.points}</td>
+      <td>{row.predictionsCount}</td>
     </tr>
   );
 }
