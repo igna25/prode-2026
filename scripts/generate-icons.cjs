@@ -13,6 +13,13 @@ async function generate() {
   await sharp(svgPath).resize(180, 180).png().toFile(path.join(publicDir, "apple-touch-icon.png"));
   console.log("Created apple-touch-icon.png (180x180)");
 
+  // PWA icons
+  await sharp(svgPath).resize(192, 192).png().toFile(path.join(publicDir, "icon-192x192.png"));
+  console.log("Created icon-192x192.png (192x192)");
+
+  await sharp(svgPath).resize(512, 512).png().toFile(path.join(publicDir, "icon-512x512.png"));
+  console.log("Created icon-512x512.png (512x512)");
+
   // favicon.ico (16x16 + 32x32)
   const ico16 = await sharp(svgPath).resize(16, 16).png().toBuffer();
   const ico32 = await sharp(svgPath).resize(32, 32).png().toBuffer();
