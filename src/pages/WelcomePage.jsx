@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useParticipantContext } from "../context/ParticipantContext";
+import InstallBanner from "../components/UI/InstallBanner";
 
 export default function WelcomePage() {
   const { participant, joinTournament, loginParticipant } = useParticipantContext();
@@ -32,6 +33,7 @@ export default function WelcomePage() {
   }
 
   return (
+    <>
     <main className="welcome-screen">
       <section className="welcome-panel">
         <div className="welcome-mark">
@@ -81,5 +83,7 @@ export default function WelcomePage() {
         </form>
       </section>
     </main>
+    <InstallBanner />
+    </>
   );
 }
