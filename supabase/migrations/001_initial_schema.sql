@@ -117,6 +117,17 @@ create policy "matches are readable"
 on public.matches for select
 using (true);
 
+drop policy if exists "matches can be inserted" on public.matches;
+create policy "matches can be inserted"
+on public.matches for insert
+with check (true);
+
+drop policy if exists "matches can be updated" on public.matches;
+create policy "matches can be updated"
+on public.matches for update
+using (true)
+with check (true);
+
 drop policy if exists "predictions privacy select" on public.predictions;
 create policy "predictions privacy select"
 on public.predictions for select
