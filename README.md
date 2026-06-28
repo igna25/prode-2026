@@ -9,7 +9,9 @@ npm install
 npm run dev
 ```
 
-La app funciona con datos locales si no hay credenciales de Supabase. Para conectar Supabase, copiar `.env.example` a `.env.local` y completar:
+La app carga los partidos desde la API pública de ESPN. No se requiere clave de API.
+
+Opcionalmente, para sincronización en Supabase:
 
 - `VITE_SUPABASE_URL`
 - `VITE_SUPABASE_ANON_KEY`

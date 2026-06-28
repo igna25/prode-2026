@@ -733,6 +733,10 @@ img {
   margin: 0;
 }
 
+.bracket-alert {
+  margin-bottom: 16px;
+}
+
 .form-success {
   margin: 0 0 12px;
   padding: 10px 12px;

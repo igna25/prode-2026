@@ -1,159 +1,130 @@
-const BASE_URL = "https://worldcup26.ir";
-const ROUND_BY_TYPE = {
-  r32: "R32",
-  r16: "R16",
-  qf: "QF",
-  sf: "SF",
-  third: "3RD",
-  final: "FINAL"
-};
+const BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
 
-const KNOCKOUT_ROUNDS = new Set(["R32", "R16", "QF", "SF", "3RD", "FINAL"]);
+const KNOCKOUT_DATE_RANGE = "20260628-20260719";
 
-async function request(path) {
-  const response = await fetch(`${BASE_URL}${path}`);
+export function canFetchFromESPN() {
+  return true;
+}
+
+export async function fetchWorldCupGames() {
+  const url = `${BASE_URL}?dates=${KNOCKOUT_DATE_RANGE}`;
+  const response = await fetch(url);
+
   if (!response.ok) {
-    throw new Error(`WorldCup26.ir responded with ${response.status}`);
+    throw new Error(`ESPN API respondió con ${response.status}`);
   }
-  return response.json();
+
+  const data = await response.json();
+  return data;
 }
 
-export function getWorldCupGames() {
-  return request("/get/games");
-}
+const ROUND_PATTERNS = [
+  ["3rd", "3RD"],
+  ["third", "3RD"],
+  ["semi", "SF"],
+  ["quarter", "QF"],
+  ["32", "R32"],
+  ["16", "R16"],
+  ["8th", "R16"],
+  ["final", "FINAL"]
+];
 
-export function getWorldCupTeams() {
-  return request("/get/teams");
-}
+export function normalizeRound(slug) {
+  if (!slug) return null;
+  const lower = slug.toLowerCase();
 
-export function getWorldCupGroups() {
-  return request("/get/groups");
-}
+  if (lower.includes("group")) return null;
 
-export function getWorldCupStadiums() {
-  return request("/get/stadiums");
-}
+  for (const [pattern, roundId] of ROUND_PATTERNS) {
+    if (lower.includes(pattern)) return roundId;
+  }
 
-function parseNullableScore(value) {
-  if (value == null || value === "" || value === "null") return null;
-  const parsed = Number(value);
-  return Number.isFinite(parsed) ? parsed : null;
-}
-
-function normalizeRound(game) {
-  const fromType = ROUND_BY_TYPE[String(game.type ?? "").toLowerCase()];
-  const fromGroup = String(game.group ?? "").toUpperCase();
-  if (fromType) return fromType;
-  if (fromGroup === "3RD") return "3RD";
-  if (KNOCKOUT_ROUNDS.has(fromGroup)) return fromGroup;
   return null;
 }
 
-function parseExternalDate(value) {
-  if (!value) return null;
-  const match = String(value).match(/^(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})$/);
-  if (!match) return new Date(value).toISOString();
-  const [, month, day, year, hour, minute] = match;
-  return `${year}-${month}-${day}T${hour}:${minute}:00-03:00`;
-}
-
-function normalizeStatus(game) {
-  const elapsed = String(game.time_elapsed ?? "").toLowerCase();
-  const finished = String(game.finished ?? "").toUpperCase() === "TRUE";
-  if (finished || elapsed === "finished") return "FINISHED";
-  if (elapsed === "live") return "LIVE";
+function normalizeStatus(typeDetail) {
+  if (!typeDetail) return "SCHEDULED";
+  const d = typeDetail.toUpperCase();
+  if (["FT", "FINAL"].includes(d)) return "FINISHED";
+  if (d.includes("PEN") || d.includes("AET")) return "FINISHED";
+  if (d.includes("'")) return "LIVE";
+  if (["1H", "HT", "2H", "ET", "BT", "P", "SUSP", "INT", "IN"].some(s => d.includes(s))) {
+    return "LIVE";
+  }
   return "SCHEDULED";
 }
 
-function teamName(game, side) {
-  const name = game[`${side}_team_name_en`];
-  const label = game[`${side}_team_label`];
-  return name || label || "Por definir";
-}
+function getPenaltyWinner(details) {
+  if (!details || !Array.isArray(details)) return null;
+  const shootoutGoals = details.filter(d => d.shootout && d.scoringPlay);
+  if (shootoutGoals.length === 0) return null;
 
-const TEAM_CODES = {
-  "Algeria": "dz",
-  "Argentina": "ar",
-  "Australia": "au",
-  "Austria": "at",
-  "Belgium": "be",
-  "Bosnia and Herzegovina": "ba",
-  "Brazil": "br",
-  "Canada": "ca",
-  "Cape Verde": "cv",
-  "Colombia": "co",
-  "Croatia": "hr",
-  "Curaçao": "cw",
-  "Czech Republic": "cz",
-  "Democratic Republic of the Congo": "cd",
-  "Ecuador": "ec",
-  "Egypt": "eg",
-  "England": "gb-eng",
-  "France": "fr",
-  "Germany": "de",
-  "Ghana": "gh",
-  "Haiti": "ht",
-  "Iran": "ir",
-  "Iraq": "iq",
-  "Ivory Coast": "ci",
-  "Japan": "jp",
-  "Jordan": "jo",
-  "Mexico": "mx",
-  "Morocco": "ma",
-  "Netherlands": "nl",
-  "New Zealand": "nz",
-  "Norway": "no",
-  "Panama": "pa",
-  "Paraguay": "py",
-  "Portugal": "pt",
-  "Qatar": "qa",
-  "Saudi Arabia": "sa",
-  "Scotland": "gb-sct",
-  "Senegal": "sn",
-  "South Africa": "za",
-  "South Korea": "kr",
-  "Spain": "es",
-  "Sweden": "se",
-  "Switzerland": "ch",
-  "Tunisia": "tn",
-  "Turkey": "tr",
-  "United States": "us",
-  "Uruguay": "uy",
-  "Uzbekistan": "uz"
-};
+  const homeTeam = details[0]?.team?.id;
+  let homePens = 0;
+  let awayPens = 0;
 
-export function normalizeExternalMatch(game, index = 0) {
-  const round = normalizeRound(game);
-  if (!round) return null;
+  for (const goal of shootoutGoals) {
+    if (goal.team?.id === homeTeam) {
+      homePens++;
+    } else {
+      awayPens++;
+    }
+  }
 
-  const homeName = teamName(game, "home");
-  const awayName = teamName(game, "away");
-
-  return {
-    id: `external-${game.id ?? game._id ?? index}`,
-    external_id: String(game.id ?? game._id ?? index),
-    round,
-    team_home: homeName,
-    team_away: awayName,
-    team_home_code: TEAM_CODES[game.home_team_name_en] ?? game.home_code?.toLowerCase?.() ?? null,
-    team_away_code: TEAM_CODES[game.away_team_name_en] ?? game.away_code?.toLowerCase?.() ?? null,
-    goals_home: parseNullableScore(game.home_score),
-    goals_away: parseNullableScore(game.away_score),
-    winner_penalty: game.penalty_winner ?? null,
-    status: normalizeStatus(game),
-    match_datetime: parseExternalDate(game.local_date ?? game.date ?? game.datetime),
-    stadium: game.stadium ?? null,
-    bracket_position: Number(game.id ?? index)
-  };
+  if (homePens > awayPens) return "HOME";
+  if (awayPens > homePens) return "AWAY";
+  return null;
 }
 
 export function normalizeExternalMatches(payload) {
-  const games = Array.isArray(payload) ? payload : payload.games ?? payload.data ?? [];
-  return games
-    .map((game, index) => normalizeExternalMatch(game, index + 1))
+  const events = payload?.events ?? [];
+  return events
+    .map((event) => {
+      const competition = event.competitions?.[0];
+      if (!competition) return null;
+
+      const seasonSlug = event.season?.slug;
+      const round = normalizeRound(seasonSlug);
+      if (!round) return null;
+
+      const homeCompetitor = competition.competitors?.find(c => c.homeAway === "home");
+      const awayCompetitor = competition.competitors?.find(c => c.homeAway === "away");
+
+      const goalsHome = homeCompetitor?.score != null ? Number(homeCompetitor.score) : null;
+      const goalsAway = awayCompetitor?.score != null ? Number(awayCompetitor.score) : null;
+
+      const statusDetail = event.status?.type?.detail || competition.status?.type?.detail;
+
+      return {
+        id: `external-${event.id}`,
+        external_id: String(event.id),
+        round,
+        team_home: homeCompetitor?.team?.displayName || "Por definir",
+        team_away: awayCompetitor?.team?.displayName || "Por definir",
+        team_home_code: homeCompetitor?.team?.logo || null,
+        team_away_code: awayCompetitor?.team?.logo || null,
+        goals_home: goalsHome,
+        goals_away: goalsAway,
+        winner_penalty: getPenaltyWinner(competition.details),
+        status: normalizeStatus(statusDetail),
+        match_datetime: event.date || competition.date,
+        stadium: competition.venue?.fullName || null,
+        bracket_position: new Date(event.date || competition.date).getTime()
+      };
+    })
     .filter(Boolean)
-    .sort((a, b) => {
-      if (a.round === b.round) return a.bracket_position - b.bracket_position;
-      return new Date(a.match_datetime) - new Date(b.match_datetime);
-    });
+    .sort((a, b) => new Date(a.match_datetime) - new Date(b.match_datetime));
+}
+
+export function assertKnockoutMatches(payload, matches) {
+  const totalEvents = payload?.events?.length ?? 0;
+  if (matches.length > 0) return;
+
+  if (totalEvents === 0) {
+    throw new Error("La API no devolvió partidos para el Mundial 2026.");
+  }
+
+  throw new Error(
+    `La API devolvió ${totalEvents} partidos, pero ninguno es de fase eliminatoria todavía.`
+  );
 }

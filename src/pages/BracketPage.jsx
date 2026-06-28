@@ -6,7 +6,7 @@ import { useMatches } from "../hooks/useMatches";
 import { usePredictions } from "../hooks/usePredictions";
 
 export default function BracketPage() {
-  const { matchesByRound, loading } = useMatches();
+  const { matchesByRound, totalMatches, loading, error } = useMatches();
   const { predictionByMatch } = usePredictions();
   const [selectedMatch, setSelectedMatch] = useState(null);
 
@@ -20,11 +20,18 @@ export default function BracketPage() {
           <h2>Cuadro</h2>
         </div>
       </div>
-      <BracketView
-        rounds={matchesByRound}
-        predictionByMatch={predictionByMatch}
-        onSelectMatch={setSelectedMatch}
-      />
+      {error && <p className="form-error bracket-alert">{error}</p>}
+      {totalMatches === 0 ? (
+        <p className="empty-state">
+          Todavía no hay partidos de fase eliminatoria para mostrar.
+        </p>
+      ) : (
+        <BracketView
+          rounds={matchesByRound}
+          predictionByMatch={predictionByMatch}
+          onSelectMatch={setSelectedMatch}
+        />
+      )}
       <PredictionModal
         match={selectedMatch}
         open={Boolean(selectedMatch)}

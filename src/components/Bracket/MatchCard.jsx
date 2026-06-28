@@ -18,11 +18,14 @@ const statusLabel = {
 
 function Flag({ code, name }) {
   if (!code) return <span className="flag-placeholder" aria-hidden="true" />;
+  const isUrl = String(code).startsWith("http");
+  const src = isUrl ? code : `https://flagcdn.com/w80/${String(code).toLowerCase()}.png`;
+
   return (
     <img
       className="flag"
-      src={`https://flagcdn.com/w80/${code.toLowerCase()}.png`}
-      alt={`Bandera de ${name}`}
+      src={src}
+      alt={`Escudo/Bandera de ${name}`}
       loading="lazy"
     />
   );

@@ -290,19 +290,17 @@ función calcularPuntos(pred, real):
 
 ---
 
-## 6. API Externa: WorldCup26.ir
+## 6. API Externa: API-Football (api-sports.io)
 
 ### 6.1 Endpoints
 | Endpoint | Descripción |
 |----------|-------------|
-| `GET /get/games` | Todos los partidos del mundial |
-| `GET /get/teams` | Todas las selecciones |
-| `GET /get/groups` | Grupos y posiciones |
-| `GET /get/stadiums` | Estadios |
+| `GET /fixtures?league=1&season=2026` | Todos los partidos del mundial |
 
 ### 6.2 Estrategia de Sincronización
-- **Supabase Edge Function** ejecutada cada 2 minutos vía pg_cron
+- **Supabase Edge Function** ejecutada cada 2-5 minutos vía pg_cron (para no pasarse del límite gratuito de 100 req/día).
 - Fetch → parseo → upsert en tabla `matches`
+- Requiere agregar API_FOOTBALL_KEY a los secrets de Supabase.
 - Si un partido pasa a `FINISHED`:
   1. Bloquear predicciones (`is_locked = true`)
   2. Ejecutar cálculo de puntos para ese partido
