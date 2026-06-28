@@ -6,6 +6,8 @@ import {
 } from "../lib/localStore";
 import { getSupabaseClient, isSupabaseConfigured } from "../lib/supabase";
 
+const PREDICTIONS_CHANGE = "prode-predictions-change";
+
 export function useStandings() {
   const [participants, setParticipants] = useState(() => getParticipants());
   const [predictions, setPredictions] = useState(() => getPredictions());
@@ -39,10 +41,18 @@ export function useStandings() {
       setParticipants(getParticipants());
       setPredictions(getPredictions());
     });
+    const onPredictionsChange = () => load();
+    window.addEventListener(PREDICTIONS_CHANGE, onPredictionsChange);
+
+    const pollTimer = setInterval(() => {
+      if (active) load();
+    }, 30000);
 
     return () => {
       active = false;
       unsubscribe();
+      window.removeEventListener(PREDICTIONS_CHANGE, onPredictionsChange);
+      clearInterval(pollTimer);
     };
   }, []);
 

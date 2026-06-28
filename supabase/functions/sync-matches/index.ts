@@ -3,6 +3,12 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 const ESPN_BASE_URL = "https://site.api.espn.com/apis/site/v2/sports/soccer/fifa.world/scoreboard";
 const KNOCKOUT_DATE_RANGE = "20260628-20260719";
 
+type Score = {
+  homeGoals: number | null;
+  awayGoals: number | null;
+  winnerPenalty?: "HOME" | "AWAY" | null;
+};
+
 const ROUND_PATTERNS: Array<[string, string]> = [
   ["3rd", "3RD"],
   ["third", "3RD"],
@@ -67,11 +73,13 @@ function normalizeEvent(event: Record<string, unknown>) {
   const homeCompetitor = competitors?.find(c => c.homeAway === "home");
   const awayCompetitor = competitors?.find(c => c.homeAway === "away");
 
-  const goalsHome = homeCompetitor?.score != null ? Number(homeCompetitor.score) : null;
-  const goalsAway = awayCompetitor?.score != null ? Number(awayCompetitor.score) : null;
-
   const eventStatus = event.status as Record<string, Record<string, unknown>> | undefined;
   const statusState = (eventStatus?.type as Record<string, unknown>)?.state;
+  const status = normalizeStatus(String(statusState ?? ""));
+
+  const hasScore = status === "LIVE" || status === "FINISHED";
+  const goalsHome = hasScore && homeCompetitor?.score != null ? Number(homeCompetitor.score) : null;
+  const goalsAway = hasScore && awayCompetitor?.score != null ? Number(awayCompetitor.score) : null;
 
   const venue = competition.venue as Record<string, unknown> | undefined;
   const details = competition.details as Record<string, unknown>[] | undefined;
@@ -90,11 +98,71 @@ function normalizeEvent(event: Record<string, unknown>) {
     goals_home: goalsHome,
     goals_away: goalsAway,
     winner_penalty: getPenaltyWinner(details),
-    status: normalizeStatus(String(statusState ?? "")),
+    status,
     match_datetime: String(event.date ?? competition.date ?? ""),
     stadium: typeof venue?.fullName === "string" ? venue.fullName : null,
     bracket_position: new Date(String(event.date ?? competition.date ?? "")).getTime()
   };
+}
+
+function resultType(home: number, away: number) {
+  if (home > away) return "HOME";
+  if (away > home) return "AWAY";
+  return "DRAW";
+}
+
+function calcAdvancingTeam(score: Score) {
+  if (score.homeGoals == null || score.awayGoals == null) return null;
+  const result = resultType(score.homeGoals, score.awayGoals);
+  return result === "DRAW" ? score.winnerPenalty : result;
+}
+
+function calcPoints(pred: Score, real: Score) {
+  if (real.homeGoals == null || real.awayGoals == null) return null;
+  if (pred.homeGoals == null || pred.awayGoals == null) return 0;
+
+  const predictedResult = resultType(pred.homeGoals, pred.awayGoals);
+  const realResult = resultType(real.homeGoals, real.awayGoals);
+
+  if (predictedResult === realResult) {
+    if (realResult !== "DRAW") {
+      if (pred.homeGoals === real.homeGoals && pred.awayGoals === real.awayGoals) return 6;
+      let points = 3;
+      if (pred.homeGoals === real.homeGoals) points += 1;
+      if (pred.awayGoals === real.awayGoals) points += 1;
+      return points;
+    }
+    const gotGoals = pred.homeGoals === real.homeGoals;
+    const gotWinner = pred.winnerPenalty === real.winnerPenalty;
+    if (gotGoals && gotWinner) return 6;
+    if (gotGoals || gotWinner) return 4;
+    return 3;
+  }
+
+  if (predictedResult === "DRAW" && realResult !== "DRAW") {
+    if (pred.winnerPenalty === calcAdvancingTeam(real)) {
+      let points = 3;
+      if (pred.homeGoals === real.homeGoals) points += 1;
+      if (pred.awayGoals === real.awayGoals) points += 1;
+      return points;
+    }
+    return 0;
+  }
+
+  if (predictedResult !== "DRAW" && realResult === "DRAW") {
+    if (calcAdvancingTeam(pred) === real.winnerPenalty) {
+      let points = 3;
+      if (pred.homeGoals === real.homeGoals) points += 1;
+      if (pred.awayGoals === real.awayGoals) points += 1;
+      return points;
+    }
+    return 0;
+  }
+
+  let individualGoalPoints = 0;
+  if (pred.homeGoals === real.homeGoals) individualGoalPoints += 1;
+  if (pred.awayGoals === real.awayGoals) individualGoalPoints += 1;
+  return individualGoalPoints;
 }
 
 Deno.serve(async () => {
@@ -122,6 +190,53 @@ Deno.serve(async () => {
 
   if (error) return Response.json({ error: error.message }, { status: 400 });
 
-  const finished = rows.filter((row) => row?.status === "FINISHED");
-  return Response.json({ ok: true, synced: rows.length, finished: finished.length });
+  const finishedRows = rows.filter((row) => row?.status === "FINISHED");
+
+  let pointsUpdated = 0;
+  for (const row of finishedRows) {
+    const { data: dbMatch } = await supabase
+      .from("matches")
+      .select("id")
+      .eq("external_id", row!.external_id)
+      .single();
+
+    if (!dbMatch) continue;
+
+    const real: Score = {
+      homeGoals: row!.goals_home,
+      awayGoals: row!.goals_away,
+      winnerPenalty: row!.winner_penalty as "HOME" | "AWAY" | null
+    };
+
+    const { data: predictions } = await supabase
+      .from("predictions")
+      .select("id, predicted_home_goals, predicted_away_goals, predicted_winner")
+      .eq("match_id", dbMatch.id);
+
+    if (!predictions?.length) continue;
+
+    const updates = await Promise.all(
+      predictions.map((pred) =>
+        supabase
+          .from("predictions")
+          .update({
+            is_locked: true,
+            points_earned: calcPoints(
+              {
+                homeGoals: pred.predicted_home_goals,
+                awayGoals: pred.predicted_away_goals,
+                winnerPenalty: pred.predicted_winner as "HOME" | "AWAY" | null
+              },
+              real
+            )
+          })
+          .eq("id", pred.id)
+      )
+    );
+
+    const errors = updates.map((u) => u.error).filter(Boolean);
+    if (!errors.length) pointsUpdated += predictions.length;
+  }
+
+  return Response.json({ ok: true, synced: rows.length, finished: finishedRows.length, pointsUpdated });
 });

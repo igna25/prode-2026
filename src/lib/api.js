@@ -84,10 +84,12 @@ export function normalizeExternalMatches(payload) {
       const homeCompetitor = competition.competitors?.find(c => c.homeAway === "home");
       const awayCompetitor = competition.competitors?.find(c => c.homeAway === "away");
 
-      const goalsHome = homeCompetitor?.score != null ? Number(homeCompetitor.score) : null;
-      const goalsAway = awayCompetitor?.score != null ? Number(awayCompetitor.score) : null;
-
       const statusState = event.status?.type?.state;
+      const status = normalizeStatus(statusState);
+      const hasScore = status === "LIVE" || status === "FINISHED";
+
+      const goalsHome = hasScore && homeCompetitor?.score != null ? Number(homeCompetitor.score) : null;
+      const goalsAway = hasScore && awayCompetitor?.score != null ? Number(awayCompetitor.score) : null;
 
       return {
         id: `external-${event.id}`,

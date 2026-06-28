@@ -113,6 +113,30 @@ export function useMatches() {
     load();
     const unsubscribeLocal = subscribeLocalStore(() => setMatches(getMatches()));
 
+    let pollTimer = null;
+    function startPollingIfLive(currentMatches) {
+      clearInterval(pollTimer);
+      const hasLive = currentMatches.some((m) => m.status === "LIVE");
+      if (hasLive && canFetchFromESPN()) {
+        pollTimer = setInterval(() => {
+          if (!active) return;
+          fetchWorldCupGames()
+            .then((payload) => {
+              if (!active) return;
+              const updated = normalizeExternalMatches(payload);
+              setMatches(updated);
+              saveMatches(updated);
+              startPollingIfLive(updated);
+            })
+            .catch(() => {});
+        }, 30000);
+      }
+    }
+
+    setTimeout(() => {
+      if (active) startPollingIfLive(getMatches());
+    }, 2000);
+
     const realtimeClient = isSupabaseConfigured ? getSupabaseClient() : null;
     const channel = realtimeClient
       ? realtimeClient
@@ -127,6 +151,7 @@ export function useMatches() {
 
     return () => {
       active = false;
+      clearInterval(pollTimer);
       unsubscribeLocal();
       if (channel) realtimeClient.removeChannel(channel);
     };
