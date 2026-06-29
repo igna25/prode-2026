@@ -38,17 +38,16 @@ function normalizeStatus(state: string | null | undefined) {
   return "SCHEDULED";
 }
 
-function getPenaltyWinner(details: Record<string, unknown>[] | null | undefined) {
-  if (!details || !Array.isArray(details)) return null;
+function getPenaltyWinner(details: Record<string, unknown>[] | null | undefined, homeTeamId: string | undefined) {
+  if (!details || !Array.isArray(details) || !homeTeamId) return null;
   const shootoutGoals = details.filter((d: Record<string, unknown>) => d.shootout && d.scoringPlay);
   if (shootoutGoals.length === 0) return null;
 
-  const homeTeam = details[0]?.team?.id as string | undefined;
   let homePens = 0;
   let awayPens = 0;
 
   for (const goal of shootoutGoals) {
-    if ((goal.team as Record<string, unknown>)?.id === homeTeam) {
+    if ((goal.team as Record<string, unknown>)?.id === homeTeamId) {
       homePens++;
     } else {
       awayPens++;
@@ -97,7 +96,7 @@ function normalizeEvent(event: Record<string, unknown>) {
       : null,
     goals_home: goalsHome,
     goals_away: goalsAway,
-    winner_penalty: getPenaltyWinner(details),
+    winner_penalty: getPenaltyWinner(details, (homeCompetitor?.team as Record<string, unknown>)?.id as string | undefined),
     status,
     match_datetime: String(event.date ?? competition.date ?? ""),
     stadium: typeof venue?.fullName === "string" ? venue.fullName : null,
