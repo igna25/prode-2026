@@ -19,6 +19,7 @@ Deno.serve(async () => {
     .from("matches")
     .select("*")
     .eq("status", "SCHEDULED")
+    .eq("notified", false)
     .gte("match_datetime", from.toISOString())
     .lte("match_datetime", to.toISOString());
 
@@ -61,6 +62,11 @@ Deno.serve(async () => {
         }
       }
     }
+
+    await supabase
+      .from("matches")
+      .update({ notified: true })
+      .eq("id", match.id);
   }
 
   return Response.json({
