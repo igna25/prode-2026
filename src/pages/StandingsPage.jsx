@@ -4,9 +4,15 @@ import { useStandings } from "../hooks/useStandings";
 
 export default function StandingsPage() {
   const { standings, loading } = useStandings();
-  const leader = standings[0];
+  const leaders = standings.filter((s) => s.rank === 1);
 
   if (loading) return <LoadingSpinner label="Cargando posiciones" />;
+
+  function leaderLabel() {
+    if (leaders.length === 0) return null;
+    if (leaders.length === 1) return `Líder: ${leaders[0].name}`;
+    return `Líderes: ${leaders.map((l) => l.name).join(" y ")}`;
+  }
 
   return (
     <section className="page-section">
@@ -15,7 +21,7 @@ export default function StandingsPage() {
           <p className="eyebrow">Ranking</p>
           <h2>Posiciones</h2>
         </div>
-        {leader && <span className="section-chip">Líder: {leader.name}</span>}
+        {leaders.length > 0 && <span className="section-chip">{leaderLabel()}</span>}
       </div>
       <StandingsTable standings={standings} />
     </section>
