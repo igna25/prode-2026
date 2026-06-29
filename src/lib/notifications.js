@@ -10,22 +10,35 @@ function base64UrlToUint8Array(base64String) {
 }
 
 export async function requestPushSubscription() {
-  if (!isPushSupported()) return null;
+  if (!isPushSupported()) {
+    console.warn("[push] Not supported");
+    return null;
+  }
 
   const permission = await Notification.requestPermission();
-  if (permission !== "granted") return null;
+  if (permission !== "granted") {
+    console.warn("[push] Permission denied:", permission);
+    return null;
+  }
 
   const registration = await navigator.serviceWorker.ready;
   const existing = await registration.pushManager.getSubscription();
   if (existing) return existing.toJSON();
 
   const publicKey = import.meta.env.VITE_VAPID_PUBLIC_KEY;
-  if (!publicKey) return null;
+  if (!publicKey) {
+    console.warn("[push] VITE_VAPID_PUBLIC_KEY not set");
+    return null;
+  }
 
-  const subscription = await registration.pushManager.subscribe({
-    userVisibleOnly: true,
-    applicationServerKey: base64UrlToUint8Array(publicKey)
-  });
-
-  return subscription.toJSON();
+  try {
+    const subscription = await registration.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: base64UrlToUint8Array(publicKey)
+    });
+    return subscription.toJSON();
+  } catch (err) {
+    console.error("[push] subscribe() failed:", err.message);
+    return null;
+  }
 }

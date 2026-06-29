@@ -9,7 +9,7 @@ export default function StandingsTable({ standings }) {
             <th>#</th>
             <th>Nombre</th>
             <th>Puntos</th>
-            <th>Prediciones</th>
+            <th>Predicciones</th>
           </tr>
         </thead>
         <tbody>

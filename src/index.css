@@ -1199,6 +1199,7 @@ img {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 8px;
   padding: 10px 12px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.04);
@@ -1213,6 +1214,10 @@ img {
 .match-preds-name {
   color: var(--white);
   font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
 }
 
 .match-preds-you {
@@ -1231,7 +1236,9 @@ img {
 .match-preds-right {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
+  flex-shrink: 0;
+  white-space: nowrap;
 }
 
 .match-preds-pts {
