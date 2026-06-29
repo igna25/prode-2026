@@ -1,1 +1,0 @@
--- No seed data: matches must come from WorldCup26.ir via sync-matches.

@@ -6,8 +6,14 @@
 .env*.local
 .env
 
+#local files
+plan.md
+
 # vercel
 .vercel
 
 # build
 /dist
+
+# generated files with secrets
+scripts/fix-crons.sql

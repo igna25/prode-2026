@@ -184,11 +184,18 @@ Deno.serve(async () => {
     .map((event: Record<string, unknown>) => normalizeEvent(event))
     .filter(Boolean);
 
+  const debugInfo = rows.map((r) => ({
+    eid: r?.external_id,
+    status: r?.status,
+    goals: `${r?.goals_home}-${r?.goals_away}`,
+    teams: `${r?.team_home} vs ${r?.team_away}`
+  }));
+
   const { error } = await supabase
     .from("matches")
     .upsert(rows, { onConflict: "external_id" });
 
-  if (error) return Response.json({ error: error.message }, { status: 400 });
+  if (error) return Response.json({ error: error.message, debug: debugInfo }, { status: 400 });
 
   const finishedRows = rows.filter((row) => row?.status === "FINISHED");
 
@@ -238,5 +245,5 @@ Deno.serve(async () => {
     if (!errors.length) pointsUpdated += predictions.length;
   }
 
-  return Response.json({ ok: true, synced: rows.length, finished: finishedRows.length, pointsUpdated });
+  return Response.json({ ok: true, synced: rows.length, finished: finishedRows.length, pointsUpdated, debug: debugInfo });
 });
