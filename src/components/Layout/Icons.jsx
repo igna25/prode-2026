@@ -17,3 +17,11 @@ export function Book() {
 export function LogOut() {
   return <span aria-hidden="true">↪</span>;
 }
+
+export function BellOn() {
+  return <span aria-hidden="true">🔔</span>;
+}
+
+export function BellOff() {
+  return <span aria-hidden="true">🔕</span>;
+}
