@@ -48,17 +48,16 @@ function normalizeStatus(state) {
   return "SCHEDULED";
 }
 
-function getPenaltyWinner(details) {
-  if (!details || !Array.isArray(details)) return null;
+function getPenaltyWinner(details, homeTeamId) {
+  if (!details || !Array.isArray(details) || !homeTeamId) return null;
   const shootoutGoals = details.filter(d => d.shootout && d.scoringPlay);
   if (shootoutGoals.length === 0) return null;
 
-  const homeTeam = details[0]?.team?.id;
   let homePens = 0;
   let awayPens = 0;
 
   for (const goal of shootoutGoals) {
-    if (goal.team?.id === homeTeam) {
+    if (goal.team?.id === homeTeamId) {
       homePens++;
     } else {
       awayPens++;
@@ -101,7 +100,7 @@ export function normalizeExternalMatches(payload) {
         team_away_code: awayCompetitor?.team?.logo || null,
         goals_home: goalsHome,
         goals_away: goalsAway,
-        winner_penalty: getPenaltyWinner(competition.details),
+        winner_penalty: getPenaltyWinner(competition.details, homeCompetitor?.team?.id),
         status: normalizeStatus(statusState),
         match_datetime: event.date || competition.date,
         stadium: competition.venue?.fullName || null,
