@@ -59,6 +59,23 @@ function getPenaltyWinner(details: Record<string, unknown>[] | null | undefined,
   return null;
 }
 
+function countPenaltyGoals(details: Record<string, unknown>[] | null | undefined, homeTeamId: string | undefined): { penalty_home: number | null; penalty_away: number | null } {
+  if (!details || !Array.isArray(details) || !homeTeamId) return { penalty_home: null, penalty_away: null };
+  const shootoutGoals = details.filter((d: Record<string, unknown>) => d.shootout && d.scoringPlay);
+  if (shootoutGoals.length === 0) return { penalty_home: null, penalty_away: null };
+
+  let homePens = 0;
+  let awayPens = 0;
+  for (const goal of shootoutGoals) {
+    if ((goal.team as Record<string, unknown>)?.id === homeTeamId) {
+      homePens++;
+    } else {
+      awayPens++;
+    }
+  }
+  return { penalty_home: homePens, penalty_away: awayPens };
+}
+
 function normalizeEvent(event: Record<string, unknown>) {
   const competitions = event.competitions as Record<string, unknown>[] | undefined;
   const competition = competitions?.[0];
@@ -82,6 +99,8 @@ function normalizeEvent(event: Record<string, unknown>) {
 
   const venue = competition.venue as Record<string, unknown> | undefined;
   const details = competition.details as Record<string, unknown>[] | undefined;
+  const homeTeamId = (homeCompetitor?.team as Record<string, unknown>)?.id as string | undefined;
+  const penalties = countPenaltyGoals(details, homeTeamId);
 
   return {
     external_id: String(event.id),
@@ -96,7 +115,9 @@ function normalizeEvent(event: Record<string, unknown>) {
       : null,
     goals_home: goalsHome,
     goals_away: goalsAway,
-    winner_penalty: getPenaltyWinner(details, (homeCompetitor?.team as Record<string, unknown>)?.id as string | undefined),
+    penalty_home: penalties.penalty_home,
+    penalty_away: penalties.penalty_away,
+    winner_penalty: getPenaltyWinner(details, homeTeamId),
     status,
     match_datetime: String(event.date ?? competition.date ?? ""),
     stadium: typeof venue?.fullName === "string" ? venue.fullName : null,

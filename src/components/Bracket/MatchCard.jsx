@@ -31,12 +31,18 @@ function Flag({ code, name }) {
   );
 }
 
-function TeamLine({ code, name, goals }) {
+function formatGoals(goals, penaltyGoals) {
+  if (goals == null) return "";
+  if (penaltyGoals != null) return `${goals} (${penaltyGoals})`;
+  return `${goals}`;
+}
+
+function TeamLine({ code, name, goals, penaltyGoals }) {
   return (
     <div className="team-line">
       <Flag code={code} name={name} />
       <span>{name || "Por definir"}</span>
-      <strong>{goals ?? ""}</strong>
+      <strong>{formatGoals(goals, penaltyGoals)}</strong>
     </div>
   );
 }
@@ -59,8 +65,8 @@ export default function MatchCard({ match, prediction, onSelect }) {
           <span className="prediction-dot">Pendiente</span>
         )}
       </div>
-      <TeamLine code={match.team_home_code} name={match.team_home} goals={match.goals_home} />
-      <TeamLine code={match.team_away_code} name={match.team_away} goals={match.goals_away} />
+      <TeamLine code={match.team_home_code} name={match.team_home} goals={match.goals_home} penaltyGoals={match.penalty_home} />
+      <TeamLine code={match.team_away_code} name={match.team_away} goals={match.goals_away} penaltyGoals={match.penalty_away} />
       {prediction && (
         <p className="match-prediction-line">
           Tu predicción: {prediction.predicted_home_goals}-{prediction.predicted_away_goals}

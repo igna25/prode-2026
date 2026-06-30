@@ -69,6 +69,23 @@ function getPenaltyWinner(details, homeTeamId) {
   return null;
 }
 
+function countPenaltyGoals(details, homeTeamId) {
+  if (!details || !Array.isArray(details) || !homeTeamId) return { penalty_home: null, penalty_away: null };
+  const shootoutGoals = details.filter(d => d.shootout && d.scoringPlay);
+  if (shootoutGoals.length === 0) return { penalty_home: null, penalty_away: null };
+
+  let homePens = 0;
+  let awayPens = 0;
+  for (const goal of shootoutGoals) {
+    if (goal.team?.id === homeTeamId) {
+      homePens++;
+    } else {
+      awayPens++;
+    }
+  }
+  return { penalty_home: homePens, penalty_away: awayPens };
+}
+
 export function normalizeExternalMatches(payload) {
   const events = payload?.events ?? [];
   return events
@@ -89,6 +106,8 @@ export function normalizeExternalMatches(payload) {
 
       const goalsHome = hasScore && homeCompetitor?.score != null ? Number(homeCompetitor.score) : null;
       const goalsAway = hasScore && awayCompetitor?.score != null ? Number(awayCompetitor.score) : null;
+      const homeTeamId = homeCompetitor?.team?.id;
+      const penalties = countPenaltyGoals(competition.details, homeTeamId);
 
       return {
         id: `external-${event.id}`,
@@ -100,7 +119,9 @@ export function normalizeExternalMatches(payload) {
         team_away_code: awayCompetitor?.team?.logo || null,
         goals_home: goalsHome,
         goals_away: goalsAway,
-        winner_penalty: getPenaltyWinner(competition.details, homeCompetitor?.team?.id),
+        penalty_home: penalties.penalty_home,
+        penalty_away: penalties.penalty_away,
+        winner_penalty: getPenaltyWinner(competition.details, homeTeamId),
         status: normalizeStatus(statusState),
         match_datetime: event.date || competition.date,
         stadium: competition.venue?.fullName || null,

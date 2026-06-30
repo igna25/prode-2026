@@ -27,7 +27,9 @@ function formatPrediction(prediction, match) {
 
 function formatResult(match) {
   if (match.goals_home == null || match.goals_away == null) return "Pendiente";
-  const base = `${match.goals_home}-${match.goals_away}`;
+  const home = match.penalty_home != null ? `${match.goals_home} (${match.penalty_home})` : `${match.goals_home}`;
+  const away = match.penalty_away != null ? `${match.goals_away} (${match.penalty_away})` : `${match.goals_away}`;
+  const base = `${home} - ${away}`;
   if (match.goals_home === match.goals_away && match.winner_penalty) {
     const winner = match.winner_penalty === "HOME" ? match.team_home : match.team_away;
     return `${base}, pasa ${winner}`;

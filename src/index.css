@@ -320,7 +320,7 @@ img {
 
 .team-line {
   display: grid;
-  grid-template-columns: 30px minmax(0, 1fr) 32px;
+  grid-template-columns: 30px minmax(0, 1fr) auto;
   align-items: center;
   gap: 10px;
   min-height: 32px;
