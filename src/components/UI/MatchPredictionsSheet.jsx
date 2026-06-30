@@ -2,12 +2,22 @@ import { useMatchPredictions } from "../../hooks/useMatchPredictions";
 import { useParticipantContext } from "../../context/ParticipantContext";
 import Modal from "./Modal";
 
-function formatPred(prediction) {
+function Flag({ code, name }) {
+  if (!code) return null;
+  const isUrl = String(code).startsWith("http");
+  const src = isUrl ? code : `https://flagcdn.com/w80/${String(code).toLowerCase()}.png`;
+  return <img className="flag" src={src} alt={name} loading="lazy" />;
+}
+
+function formatPred(prediction, match) {
   const base = `${prediction.predicted_home_goals}-${prediction.predicted_away_goals}`;
   if (prediction.predicted_home_goals === prediction.predicted_away_goals && prediction.predicted_winner) {
-    return `${base} (pasa ${prediction.predicted_winner === "HOME" ? "Local" : "Visitante"})`;
+    const isHome = prediction.predicted_winner === "HOME";
+    const teamName = isHome ? match.team_home : match.team_away;
+    const code = isHome ? match.team_home_code : match.team_away_code;
+    return { base, penalty: true, teamName, code };
   }
-  return base;
+  return { base, penalty: false };
 }
 
 function formatPoints(points) {
@@ -40,7 +50,21 @@ export default function MatchPredictionsSheet({ match, open, onClose }) {
                   {p.participant_id === participant?.id && <span className="match-preds-you"> (vos)</span>}
                 </span>
                 <span className="match-preds-right">
-                  <span className="match-preds-score">{formatPred(p)}</span>
+                  <span className="match-preds-score">
+                    {(() => {
+                      const pred = formatPred(p, match);
+                      return (
+                        <>
+                          {pred.base}
+                          {pred.penalty && (
+                            <span className="match-preds-penalty">
+                              {" "}(pasa <Flag code={pred.code} name={pred.teamName} />)
+                            </span>
+                          )}
+                        </>
+                      );
+                    })()}
+                  </span>
                   {formatPoints(p.points_earned) && (
                     <span className={`match-preds-pts${p.points_earned > 0 ? " has-pts" : ""}`}>
                       {formatPoints(p.points_earned)}

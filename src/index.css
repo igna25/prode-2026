@@ -1233,6 +1233,19 @@ img {
   font-size: 0.9rem;
 }
 
+.match-preds-penalty {
+  font-weight: 400;
+  font-size: 0.85rem;
+  vertical-align: middle;
+}
+
+.match-preds-penalty .flag {
+  width: 20px;
+  height: 15px;
+  vertical-align: middle;
+  border-radius: 2px;
+}
+
 .match-preds-right {
   display: flex;
   align-items: center;
