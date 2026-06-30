@@ -145,7 +145,10 @@ function calcPoints(pred: Score, real: Score) {
       if (pred.awayGoals === real.awayGoals) points += 1;
       return points;
     }
-    return 0;
+    let points = 0;
+    if (pred.homeGoals === real.homeGoals) points += 1;
+    if (pred.awayGoals === real.awayGoals) points += 1;
+    return points;
   }
 
   if (predictedResult !== "DRAW" && realResult === "DRAW") {
@@ -155,7 +158,10 @@ function calcPoints(pred: Score, real: Score) {
       if (pred.awayGoals === real.awayGoals) points += 1;
       return points;
     }
-    return 0;
+    let points = 0;
+    if (pred.homeGoals === real.homeGoals) points += 1;
+    if (pred.awayGoals === real.awayGoals) points += 1;
+    return points;
   }
 
   let individualGoalPoints = 0;

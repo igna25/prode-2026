@@ -309,8 +309,8 @@ img {
   border-radius: 6px;
   font-size: 0.72rem;
   font-weight: 700;
-  color: var(--muted);
-  background: rgba(255, 255, 255, 0.06);
+  color: var(--red);
+  background: rgba(239, 83, 80, 0.18);
 }
 
 .match-card-points.has-pts {

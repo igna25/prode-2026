@@ -69,7 +69,10 @@ export function calculatePoints(prediction, matchResult) {
       if (pred.awayGoals === real.awayGoals) points += 1;
       return points;
     }
-    return 0;
+    let points = 0;
+    if (pred.homeGoals === real.homeGoals) points += 1;
+    if (pred.awayGoals === real.awayGoals) points += 1;
+    return points;
   }
 
   if (predictedResult !== RESULT.DRAW && realResult === RESULT.DRAW) {
@@ -80,7 +83,10 @@ export function calculatePoints(prediction, matchResult) {
       if (pred.awayGoals === real.awayGoals) points += 1;
       return points;
     }
-    return 0;
+    let points = 0;
+    if (pred.homeGoals === real.homeGoals) points += 1;
+    if (pred.awayGoals === real.awayGoals) points += 1;
+    return points;
   }
 
   let individualGoalPoints = 0;
