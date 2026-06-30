@@ -183,8 +183,11 @@ export function recalculateLocalPoints(matchId) {
   return nextPredictions;
 }
 
-export function subscribeLocalStore(callback) {
-  const handler = () => callback();
+export function subscribeLocalStore(key, callback) {
+  const handler = (event) => {
+    if (event.type === "prode-store-change" && event.detail?.key && event.detail.key !== key) return;
+    callback();
+  };
   window.addEventListener("storage", handler);
   window.addEventListener("prode-store-change", handler);
   return () => {

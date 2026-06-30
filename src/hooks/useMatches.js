@@ -111,7 +111,7 @@ export function useMatches() {
     }
 
     load();
-    const unsubscribeLocal = subscribeLocalStore(() => setMatches(getMatches()));
+    const unsubscribeLocal = subscribeLocalStore("prode2026.matches", () => setMatches(getMatches()));
 
     let pollTimer = null;
     function startPollingIfLive(currentMatches) {

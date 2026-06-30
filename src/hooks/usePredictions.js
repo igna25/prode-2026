@@ -53,7 +53,7 @@ export function usePredictions(matchId) {
     }
 
     load();
-    const unsubscribeLocal = subscribeLocalStore(() => setPredictions(getPredictions()));
+    const unsubscribeLocal = subscribeLocalStore("prode2026.predictions", () => setPredictions(getPredictions()));
     const onPredictionsChange = () => load();
     window.addEventListener(PREDICTIONS_CHANGE, onPredictionsChange);
 

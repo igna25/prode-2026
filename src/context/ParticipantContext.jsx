@@ -18,7 +18,7 @@ export function ParticipantProvider({ children }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    return subscribeLocalStore(() => setParticipant(getCurrentParticipant()));
+    return subscribeLocalStore("prode2026.participant", () => setParticipant(getCurrentParticipant()));
   }, []);
 
   async function joinTournament(name) {

@@ -37,8 +37,10 @@ export function useStandings() {
     }
 
     load();
-    const unsubscribe = subscribeLocalStore(() => {
+    const unsubParticipants = subscribeLocalStore("prode2026.participants", () => {
       setParticipants(getParticipants());
+    });
+    const unsubPredictions = subscribeLocalStore("prode2026.predictions", () => {
       setPredictions(getPredictions());
     });
     const onPredictionsChange = () => load();
@@ -50,7 +52,8 @@ export function useStandings() {
 
     return () => {
       active = false;
-      unsubscribe();
+      unsubParticipants();
+      unsubPredictions();
       window.removeEventListener(PREDICTIONS_CHANGE, onPredictionsChange);
       clearInterval(pollTimer);
     };
